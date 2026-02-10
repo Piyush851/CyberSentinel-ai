@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+venv/
+.env
+
+# Node/React
+node_modules/
+dist/
+.DS_Store
+
+# Machine Learning Data & Models (Too large for standard Git)
+*.csv
+*.pkl
+*.h5
+*.joblib
+ml_engine/datasets/*
+!ml_engine/datasets/.gitkeep
+
+# IDEs
+.vscode/
+.idea/
