@@ -10,7 +10,7 @@ app = FastAPI(title="CyberSentinel AI Backend")
 # --- CORS (Allow Frontend to talk to us) ---
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], 
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

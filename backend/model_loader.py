@@ -65,25 +65,40 @@ class ThreatEngine:
 
     def _ml_predict_url(self, url: str) -> dict:
         """
-        Handles URL predictions using Kumkum's Random Forest.
+        Handles URL predictions using a Hybrid ML + Rule-Based approach.
         """
-        # 1. Extract the 9 features
         features = extract_url_features(url)
+        feat_list = features[0]
         
-        # 2. Predict
+        # 1. Get ML Prediction
         prob = self.url_model.predict_proba(features)[0][1]
+        
+        # 2. HYBRID OVERRIDE: Check for severe structural red flags
+        # feat_list[2] is 'IsDomainIP'
+        # feat_list[0] is 'URLLength'
+        is_ip = feat_list[2] == 1
+        is_suspiciously_long = feat_list[0] > 75
+        
+        # If it's a raw IP, it's almost certainly malicious, override the ML model
+        if is_ip:
+            prob = max(prob, 0.95) # Force risk score to at least 95%
+            
         is_phishing = prob > 0.5
         
-        # 3. Explainability (XAI) - MVP Level
+        # 3. Explainability (XAI)
         reasons = []
-        feat_list = features[0]
         if is_phishing:
-            if feat_list[0] > 75: reasons.append("URL is abnormally long")
-            if feat_list[2] == 1: reasons.append("Uses a raw IP address instead of a domain name")
+            if is_suspiciously_long: reasons.append("URL is abnormally long")
+            if is_ip: reasons.append("Uses a raw IP address instead of a domain name")
             if feat_list[3] > 2:  reasons.append("Contains excessive subdomains")
             if feat_list[8] == 0: reasons.append("Missing secure HTTPS protocol")
             
+            # If the ML flagged it but no specific rules triggered
+            if not reasons:
+                reasons.append(f"AI Model classified structure as malicious")
+
         explanation = " | ".join(reasons) if reasons else f"AI Confidence Score: {prob*100:.1f}%"
+        
         if not is_phishing:
             explanation = "URL structure appears standard and safe."
 
