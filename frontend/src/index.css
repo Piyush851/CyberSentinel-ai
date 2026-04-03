@@ -1,6 +1,5 @@
 @import "tailwindcss";
 
-
 /* Custom Matrix Rain Animation */
 @keyframes matrix-fall {
   0% { transform: translateY(-10vh); opacity: 0; }

@@ -1,25 +1,29 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // IMPORT ROUTER HOOK
 import MatrixRain from "../../components/MatrixRain/MatrixRain";
 
-const HomePage = ({ setPage }) => {
+const HomePage = () => {
+  const navigate = useNavigate(); // Initialize navigation
   const [typed, setTyped] = useState("");
-  const full = "Detecting threats. Explaining decisions. Protecting humans.";
+  const fullText = "Detecting threats. Explaining decisions. Protecting humans.";
 
+  // Typewriter Effect
   useEffect(() => {
     let i = 0;
     const t = setInterval(() => {
-      setTyped(full.slice(0, i++));
-      if (i > full.length) clearInterval(t);
+      setTyped(fullText.slice(0, i++));
+      if (i > fullText.length) clearInterval(t);
     }, 45);
     return () => clearInterval(t);
-  }, []);
+  }, [fullText]);
 
   const stats = [
     { label: "Threats Detected", value: "2.4M+",  icon: "⚡", color: "var(--accent2)" },
-    { label: "Accuracy Rate",    value: "99.2%",   icon: "🎯", color: "var(--accent)"  },
-    { label: "Avg Response",     value: "<80ms",   icon: "⏱",  color: "var(--warn)"   },
-    { label: "Zero-Day Caught",  value: "14.8K",   icon: "🔴", color: "var(--danger)" },
+    { label: "Accuracy Rate",    value: "99.2%",  icon: "🎯", color: "var(--accent)"  },
+    { label: "Avg Response",     value: "<80ms",  icon: "⏱",  color: "var(--warn)"   },
+    { label: "Zero-Day Caught",  value: "14.8K",  icon: "🔴", color: "var(--danger)" },
   ];
+
   const features = [
     { title: "Real-Time Detection",  desc: "ML classifiers analyse URLs and SMS in under 80ms for instant threat assessment.", icon: "⚡" },
     { title: "Explainable AI (XAI)", desc: "Every decision broken down into human-readable risk factors — no black boxes.", icon: "🧠" },
@@ -31,8 +35,8 @@ const HomePage = ({ setPage }) => {
     <div className="page-wrap grid-bg">
       <MatrixRain />
 
-      {/* ── HERO ── */}
-      <div style={{
+      {/* ── HERO SECTION ── */}
+      <section style={{
         position: "relative", zIndex: 1,
         display: "flex", flexDirection: "column",
         alignItems: "center", justifyContent: "center",
@@ -40,8 +44,9 @@ const HomePage = ({ setPage }) => {
         textAlign: "center",
         padding: "56px var(--page-px) 48px",
       }}>
-        {/* Radar rings */}
-        <div style={{
+        
+        {/* Radar rings (Decorative) */}
+        <div aria-hidden="true" style={{
           position: "absolute",
           width: "min(520px, 88vw)", height: "min(520px, 88vw)",
           opacity: 0.05, pointerEvents: "none",
@@ -78,30 +83,34 @@ const HomePage = ({ setPage }) => {
           <span style={{ color: "var(--accent2)" }}> AI</span>
         </h1>
 
-        <p className="mono fade-up" style={{
-          fontSize: "clamp(11px, 2.2vw, 14px)",
-          color: "var(--text)", maxWidth: 500,
-          lineHeight: 2, marginBottom: 36, minHeight: 44,
-        }}>
-          {typed}<span style={{ animation: "blink 1s infinite" }}>|</span>
+        {/* Accessibility Fix: Screen readers read the aria-label immediately, ignoring the typing animation */}
+        <p 
+          className="mono fade-up" 
+          aria-label={fullText}
+          style={{
+            fontSize: "clamp(11px, 2.2vw, 14px)",
+            color: "var(--text)", maxWidth: 500,
+            lineHeight: 2, marginBottom: 36, minHeight: 44,
+          }}
+        >
+          <span aria-hidden="true">{typed}</span>
+          <span aria-hidden="true" style={{ animation: "blink 1s infinite" }}>|</span>
         </p>
 
+        {/* Upgraded Routing Buttons */}
         <div className="hero-btns fade-up" style={{
-          display: "flex", gap: 12,
-          flexWrap: "wrap", justifyContent: "center",
+          display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center",
         }}>
-          <button className="btn-primary" onClick={() => setPage("url-scanner")}>Scan URL</button>
-          <button className="btn-secondary" onClick={() => setPage("sms-scanner")}>Analyse SMS</button>
-          <button className="btn-secondary" onClick={() => setPage("dashboard")}>Dashboard</button>
+          <button className="btn-primary" onClick={() => navigate("/url-scanner")}>Scan URL</button>
+          <button className="btn-secondary" onClick={() => navigate("/sms-scanner")}>Analyse SMS</button>
+          <button className="btn-secondary" onClick={() => navigate("/dashboard")}>Dashboard</button>
         </div>
 
         {/* Threat alert banner */}
-        <div className="hero-alert fade-up" style={{
-          marginTop: 48,
-          display: "flex", alignItems: "center", gap: 10,
+        <div className="hero-alert fade-up" role="alert" style={{
+          marginTop: 48, display: "flex", alignItems: "center", gap: 10,
           flexWrap: "wrap", justifyContent: "center",
-          background: "rgba(255,51,102,0.06)",
-          border: "1px solid rgba(255,51,102,0.25)",
+          background: "rgba(255,51,102,0.06)", border: "1px solid rgba(255,51,102,0.25)",
           padding: "11px 18px", borderRadius: 7, maxWidth: 540,
         }}>
           <div style={{
@@ -111,22 +120,20 @@ const HomePage = ({ setPage }) => {
           <span className="mono" style={{ fontSize: 10, color: "var(--danger)" }}>GLOBAL THREAT LEVEL: ELEVATED</span>
           <span className="mono" style={{ fontSize: 10, color: "var(--muted)" }}>— 347 new phishing domains today</span>
         </div>
-      </div>
+      </section>
 
-      {/* ── STATS ── */}
-      <div style={{ position: "relative", zIndex: 1 }}>
+      {/* ── STATS SECTION ── */}
+      <section style={{ position: "relative", zIndex: 1 }}>
         <div className="page-container" style={{ paddingTop: 0, paddingBottom: 0 }}>
           <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
+            display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
             gap: 16, marginBottom: 28,
           }}>
             {stats.map((s, i) => (
               <div key={i} className="stat-card" style={{ textAlign: "center" }}>
-                <div style={{ fontSize: 26, marginBottom: 8 }}>{s.icon}</div>
+                <div aria-hidden="true" style={{ fontSize: 26, marginBottom: 8 }}>{s.icon}</div>
                 <div className="orbitron" style={{
-                  fontSize: "clamp(20px, 4vw, 26px)",
-                  fontWeight: 700, color: s.color, marginBottom: 5,
+                  fontSize: "clamp(20px, 4vw, 26px)", fontWeight: 700, color: s.color, marginBottom: 5,
                 }}>
                   {s.value}
                 </div>
@@ -137,10 +144,10 @@ const HomePage = ({ setPage }) => {
             ))}
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* ── FEATURES ── */}
-      <div style={{ position: "relative", zIndex: 1 }}>
+      {/* ── FEATURES SECTION ── */}
+      <section style={{ position: "relative", zIndex: 1 }}>
         <div className="page-container" style={{ paddingTop: 0 }}>
           <div className="mono" style={{ fontSize: 9, color: "var(--accent)", letterSpacing: 4, marginBottom: 8 }}>
             // capabilities
@@ -149,9 +156,7 @@ const HomePage = ({ setPage }) => {
             Core Modules
           </h2>
           <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-            gap: 16,
+            display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16,
           }}>
             {features.map((f, i) => (
               <div key={i} style={{
@@ -170,16 +175,17 @@ const HomePage = ({ setPage }) => {
                   e.currentTarget.style.boxShadow   = "";
                 }}
               >
-                <div style={{ fontSize: 30, marginBottom: 12 }}>{f.icon}</div>
-                <div className="orbitron" style={{ fontSize: 11, color: "var(--accent)", marginBottom: 8, letterSpacing: 1.5 }}>
+                <div aria-hidden="true" style={{ fontSize: 30, marginBottom: 12 }}>{f.icon}</div>
+                <h3 className="orbitron" style={{ fontSize: 11, color: "var(--accent)", marginBottom: 8, letterSpacing: 1.5, margin: 0, paddingBottom: 8 }}>
                   {f.title}
-                </div>
-                <div style={{ fontSize: 13, color: "var(--muted)", lineHeight: 1.75 }}>{f.desc}</div>
+                </h3>
+                <p style={{ fontSize: 13, color: "var(--muted)", lineHeight: 1.75, margin: 0 }}>{f.desc}</p>
               </div>
             ))}
           </div>
         </div>
-      </div>
+      </section>
+      
     </div>
   );
 };

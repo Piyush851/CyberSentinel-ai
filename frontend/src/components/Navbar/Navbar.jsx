@@ -1,28 +1,31 @@
 import { useState, useEffect } from "react";
+import { Link, NavLink } from "react-router-dom";
 
-const Navbar = ({ page, setPage }) => {
+const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [time, setTime] = useState(new Date());
   const [scrolled, setScrolled] = useState(false);
 
+  // Live Clock Effect
   useEffect(() => {
     const t = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(t);
   }, []);
 
+  // Scroll Blur Effect
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Updated to use actual URL paths
   const navItems = [
-    { key: "home",        label: "Home" },
-    { key: "url-scanner", label: "URL Scanner" },
-    { key: "sms-scanner", label: "SMS Scanner" },
-    { key: "dashboard",   label: "Dashboard" },
+    { path: "/", label: "Home" },
+    { path: "/url-scanner", label: "URL Scanner" },
+    { path: "/sms-scanner", label: "SMS Scanner" },
+    { path: "/dashboard", label: "Dashboard" },
   ];
-  const go = (p) => { setPage(p); setMenuOpen(false); };
 
   return (
     <>
@@ -34,7 +37,7 @@ const Navbar = ({ page, setPage }) => {
         height: "var(--nav-h)",
         transition: "background 0.3s, border-color 0.3s",
       }}>
-        {/* Inner container — same max-width as pages */}
+        {/* Inner container */}
         <div style={{
           maxWidth: "var(--max-w)",
           margin: "0 auto",
@@ -42,12 +45,15 @@ const Navbar = ({ page, setPage }) => {
           height: "100%",
           display: "flex",
           alignItems: "center",
+          justifyContent: "space-between",
           gap: 12,
         }}>
-          {/* Logo */}
-          <button
-            onClick={() => go("home")}
-            style={{ display: "flex", alignItems: "center", gap: 10, flex: 1, minWidth: 0, background: "none", border: "none", cursor: "pointer", padding: 0 }}
+          
+          {/* Logo - Now a Router <Link> instead of a <button> */}
+          <Link 
+            to="/" 
+            onClick={() => setMenuOpen(false)}
+            style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0, textDecoration: "none" }}
           >
             <svg viewBox="0 0 36 36" fill="none" style={{ width: 32, height: 32, flexShrink: 0 }}>
               <polygon
@@ -65,18 +71,19 @@ const Navbar = ({ page, setPage }) => {
               </div>
               <div className="mono" style={{ fontSize: 8, color: "var(--muted)", letterSpacing: 1.5 }}>AI THREAT DETECTION</div>
             </div>
-          </button>
+          </Link>
 
-          {/* Desktop nav */}
+          {/* Desktop Nav - Using <NavLink> for automatic active state detection */}
           <div className="desktop-nav" style={{ display: "flex", gap: 30 }}>
             {navItems.map(n => (
-              <button
-                key={n.key}
-                className={`nav-link ${page === n.key ? "active" : ""}`}
-                onClick={() => go(n.key)}
+              <NavLink
+                key={n.path}
+                to={n.path}
+                className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}
+                style={{ textDecoration: "none", background: "none", border: "none", cursor: "pointer" }}
               >
                 {n.label}
-              </button>
+              </NavLink>
             ))}
           </div>
 
@@ -86,11 +93,12 @@ const Navbar = ({ page, setPage }) => {
             <div style={{ fontSize: 9, marginTop: 1 }}>{time.toLocaleDateString()}</div>
           </div>
 
-          {/* Hamburger */}
+          {/* Hamburger (Mobile) */}
           <button
             className={`hamburger ${menuOpen ? "open" : ""}`}
             onClick={() => setMenuOpen(o => !o)}
             aria-label="Toggle menu"
+            style={{ background: "none", border: "none", cursor: "pointer" }}
           >
             <span /><span /><span />
           </button>
@@ -107,15 +115,20 @@ const Navbar = ({ page, setPage }) => {
         overflow: "hidden",
         transition: "max-height 0.32s ease",
         padding: menuOpen ? "12px 20px 20px" : "0 20px",
+        display: "flex",
+        flexDirection: "column",
+        gap: "10px"
       }}>
         {navItems.map(n => (
-          <button
-            key={n.key}
-            className={`mobile-nav-link ${page === n.key ? "active" : ""}`}
-            onClick={() => go(n.key)}
+          <NavLink
+            key={n.path}
+            to={n.path}
+            className={({ isActive }) => `mobile-nav-link ${isActive ? "active" : ""}`}
+            onClick={() => setMenuOpen(false)}
+            style={{ textDecoration: "none" }}
           >
             {n.label}
-          </button>
+          </NavLink>
         ))}
         <div className="mono" style={{ fontSize: 11, color: "var(--muted)", paddingTop: 14 }}>
           <span style={{ color: "var(--accent)" }}>{time.toLocaleTimeString()}</span>
